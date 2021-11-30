@@ -8,13 +8,13 @@ jobs:
       fail-fast: false
       matrix:
         config:
-#        - {
-#            name: "Windows Latest MSVC",
-#            os: windows-latest,
-#            cc: "cl",
-#            cxx: "cl",
-#            environment_script: "C:/Program Files (x86)/Microsoft Visual Studio/2022/Enterprise/VC/Auxiliary/Build/vcvars64.bat",
-#          }
+        - {
+            name: "Windows Latest MSVC",
+            os: windows-2022,
+            cc: "cl",
+            cxx: "cl",
+            environment_script: "C:/Program Files (x86)/Microsoft Visual Studio/2022/Enterprise/VC/Auxiliary/Build/vcvars64.bat",
+          }
         - {
             name: "Ubuntu Latest gcc",
             os: ubuntu-latest,
@@ -36,22 +36,46 @@ jobs:
     env:
       CC: ${{ matrix.config.cc }}
       CXX: ${{ matrix.config.cxx }}
+      VCPKG_DEFAULT_TRIPLET: x64-windows
     steps:
       - uses: actions/checkout@v2
       - run: echo "🏃‍♂️ Running job ${{ matrix.config.name }}."
       - name: Install dependencies
-        run: sudo apt-get install -y librange-v3-dev libfmt-dev
+        if: matrix.config.os == 'ubuntu-latest'
+        run: sudo apt-get install -y librange-v3-dev libfmt-dev ninja-build
+      - name: Install dependencies
+        if: matrix.config.os == 'windows-2022'
+        run: |
+            vcpkg install fmt
+            vcpkg install range-v3
       - name: Compiler info
+        if: matrix.config.os == 'ubuntu-latest'
         run: |
             which cmake
             cmake --version
             which ${CXX}
             ${CXX} --version
       - name: Build
+        if: matrix.config.os == 'ubuntu-latest'
         run: |
             cd build
-            cmake -DCMAKE_BUILD_TYPE=Debug ..
+            cmake -G Ninja -DCMAKE_BUILD_TYPE=Debug -DGENERATE_COVERAGE_INFO=ON -DGCOV_COMMAND=/usr/bin/gcov-10 ..
             cmake --build .
+      - name: Build
+        if: matrix.config.os == 'windows-2022'
+        run: |
+            cd build
+            cmake -G "Visual Studio 17 2022" -A x64 -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake ..
+            cmake --build . --config Debug
       - name: Test
         run: |
-            ctest .
+            ctest -C Debug
+#      - name: Code Coverage
+#        if: matrix.config.cc == 'gcc-10'
+#        run: |
+#            cmake --build . --target coverage
+#            bash <(curl -s https://codecov.io/bash) -x /usr/bin/gcov-10 2> /dev/null
+#      - name: Results
+#        run: |
+#            echo "Run"
+

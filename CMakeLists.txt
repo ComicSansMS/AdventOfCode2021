@@ -64,6 +64,9 @@ add_compile_options($<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>:-Wex
 
 if(MSVC)
     configure_file(${PROJECT_SOURCE_DIR}/run.cmd.in ${PROJECT_BINARY_DIR}/run.cmd COPYONLY)
+else()
+    configure_file(${PROJECT_SOURCE_DIR}/run.sh.in ${PROJECT_BINARY_DIR}/run.sh COPYONLY)
+    file(CHMOD ${PROJECT_BINARY_DIR}/run.sh FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ WORLD_READ)
 endif()
 
 enable_testing()

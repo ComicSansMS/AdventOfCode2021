@@ -69,12 +69,21 @@ jobs:
             cmake --build . --config Debug
       - name: Test
         run: |
+            cd build
             ctest -C Debug
-#      - name: Code Coverage
-#        if: matrix.config.cc == 'gcc-10'
-#        run: |
-#            cmake --build . --target coverage
-#            bash <(curl -s https://codecov.io/bash) -x /usr/bin/gcov-10 2> /dev/null
-#      - name: Results
-#        run: |
-#            echo "Run"
+      - name: Code Coverage
+        if: matrix.config.cc == 'gcc-10'
+        run: |
+            cd build
+            cmake --build . --target coverage
+            bash <(curl -s https://codecov.io/bash) -x /usr/bin/gcov-10 2> /dev/null
+      - name: Results
+        if: matrix.config.os == 'ubuntu-latest'
+        run: |
+            cd build
+            ./run.sh
+      - name: Results
+        if: matrix.config.os == 'windows-2022'
+        run: |
+            cd build
+            .\run.cmd

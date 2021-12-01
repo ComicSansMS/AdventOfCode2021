@@ -30,6 +30,9 @@ jobs:
             ${CXX} --version
       - name: 👷‍♂️ Build
         run: |
+            export CC=$(brew --prefix llvm)/bin/clang
+            export CXX=$(brew --prefix llvm)/bin/clang++
+            ${CXX} --version
             cd build
             cmake -G Ninja -DCMAKE_BUILD_TYPE=Debug ..
             cmake --build .

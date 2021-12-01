@@ -1,7 +1,9 @@
 Advent of Code 2021
 ===================
 
-**Build status:** [![Build Status](https://github.com/ComicSansMS/AdventOfCode2021/actions/workflows/build-and-test.yml/badge.svg)](https://github.com/ComicSansMS/AdventOfCode2021/actions)
+**Build status:** [![Build Status Ubuntu](https://github.com/ComicSansMS/AdventOfCode2021/actions/workflows/build-and-test-ubuntu.yml/badge.svg)](https://github.com/ComicSansMS/AdventOfCode2021/actions)
+[![Build Status Windows](https://github.com/ComicSansMS/AdventOfCode2021/actions/workflows/build-and-test-windows.yml/badge.svg)](https://github.com/ComicSansMS/AdventOfCode2021/actions)
+[![Build Status macOS](https://github.com/ComicSansMS/AdventOfCode2021/actions/workflows/build-and-test-macos.yml/badge.svg)](https://github.com/ComicSansMS/AdventOfCode2021/actions)
 [![codecov.io](https://codecov.io/github/ComicSansMS/AdventOfCode2021/coverage.svg?branch=main)](https://codecov.io/github/ComicSansMS/AdventOfCode2021/branch/main)
 
 

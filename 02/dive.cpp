@@ -5,7 +5,6 @@
 #include <range/v3/view/transform.hpp>
 
 #include <cassert>
-#include <stdexcept>
 #include <string>
 
 std::vector<Command> parseInput(std::string_view input)
@@ -22,13 +21,11 @@ std::vector<Command> parseInput(std::string_view input)
             } else if (str.starts_with(str_down)) {
                 int64_t const n = std::stoi(str.substr(sizeof(str_down) - 1));
                 return Down{ .n = n };
-            } else if (str.starts_with(str_up)) {
+            } else {
+                assert(str.starts_with(str_up));
                 int64_t const n = std::stoi(str.substr(sizeof(str_up) - 1));
                 return Up{ .n = n };
-            } else {
-                assert(str.empty());
             }
-            throw std::logic_error{ "Unreachable" };
         }));
 }
 

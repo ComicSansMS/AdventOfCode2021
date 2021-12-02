@@ -8,11 +8,6 @@
 #include <stdexcept>
 #include <string>
 
-namespace {
-template<class... Ts> struct overloaded : Ts... { using Ts::operator()...; };
-template<class... Ts> overloaded(Ts...)->overloaded<Ts...>;
-}
-
 std::vector<Command> parseInput(std::string_view input)
 {
     return ranges::to<std::vector<Command>>(input | ranges::views::split('\n') |
@@ -37,30 +32,51 @@ std::vector<Command> parseInput(std::string_view input)
         }));
 }
 
+void courseCommand(Position& pos, Forward const& f)
+{
+    pos.x += f.n;
+}
+
+void courseCommand(Position& pos, Down const& d)
+{
+    pos.y += d.n;
+}
+
+void courseCommand(Position& pos, Up const& u)
+{
+    pos.y -= u.n;
+}
+
 Position plotCourse(std::vector<Command> const& commands)
 {
     Position pos{};
     for (auto const& cmd : commands) {
-        std::visit(
-            overloaded(
-                [&pos](Forward const& f) { pos.x += f.n; },
-                [&pos](Down const& d)    { pos.y += d.n; },
-                [&pos](Up const& u)      { pos.y -= u.n; }
-        ), cmd);
+        std::visit([&pos](auto v) { courseCommand(pos, v); }, cmd);
     }
     return pos;
+}
+
+void courseCommand2(Submarine& sub, Forward const& f)
+{
+    sub.x += f.n;
+    sub.y += sub.aim * f.n;
+}
+
+void courseCommand2(Submarine& sub, Down const& d)
+{
+    sub.aim += d.n;;
+}
+
+void courseCommand2(Submarine& sub, Up const& u)
+{
+    sub.aim -= u.n;
 }
 
 Submarine plotCourse2(std::vector<Command> const& commands)
 {
     Submarine sub{};
     for (auto const& cmd : commands) {
-        std::visit(
-            overloaded(
-                [&sub](Forward const& f) { sub.x += f.n; sub.y += sub.aim * f.n; },
-                [&sub](Down const& d)    { sub.aim += d.n; },
-                [&sub](Up const& u)      { sub.aim -= u.n; }
-        ), cmd);
+        std::visit([&sub](auto v) { courseCommand2(sub, v); }, cmd);
     }
     return sub;
 }

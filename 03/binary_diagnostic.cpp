@@ -62,14 +62,16 @@ void filterO2Candidate(std::vector<ReportEntry>& candidates, int64_t position)
     int const zero_bits = static_cast<int>(candidates.size()) - one_bits;
     if (one_bits >= zero_bits) {
         // keep 1s
-        candidates.erase(std::remove_if(begin(candidates), end(candidates), [position](ReportEntry const& e) -> bool {
+        auto const it = std::remove_if(begin(candidates), end(candidates), [position](ReportEntry const& e) -> bool {
                 return !(e[position]);
-            }), end(candidates));
+            });
+        candidates.erase(it, end(candidates));
     } else {
         // keep 0s
-        candidates.erase(std::remove_if(begin(candidates), end(candidates), [position](ReportEntry const& e) -> bool {
+        auto const it = std::remove_if(begin(candidates), end(candidates), [position](ReportEntry const& e) -> bool {
                 return e[position];
-            }), end(candidates));
+            });
+        candidates.erase(it, end(candidates));
     }
 }
 
@@ -91,14 +93,16 @@ void filterCO2Candidate(std::vector<ReportEntry>& candidates, int64_t position)
     int const zero_bits = static_cast<int>(candidates.size()) - one_bits;
     if (one_bits >= zero_bits) {
         // keep 0s
-        candidates.erase(std::remove_if(begin(candidates), end(candidates), [position](ReportEntry const& e) -> bool {
-            return e[position];
-            }), end(candidates));
+        auto const it = std::remove_if(begin(candidates), end(candidates), [position](ReportEntry const& e) -> bool {
+                return e[position];
+            });
+        candidates.erase(it, end(candidates));
     } else {
         // keep 1s
-        candidates.erase(std::remove_if(begin(candidates), end(candidates), [position](ReportEntry const& e) -> bool {
-            return !(e[position]);
-            }), end(candidates));
+        auto const it = std::remove_if(begin(candidates), end(candidates), [position](ReportEntry const& e) -> bool {
+                return !(e[position]);
+            });
+        candidates.erase(it, end(candidates));
     }
 }
 

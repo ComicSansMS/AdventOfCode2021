@@ -226,6 +226,24 @@ TEST_CASE("Giant Squid")
         CHECK(sumUnmarked(game.boards[2]) == 188);
     }
 
+    SECTION("Play Board")
+    {
+        CHECK(!playBoard(game.boards[0], game.numbers[0]));
+        CHECK(game.boards[0].hits ==
+            std::array{ false, false, false, false, false,
+                        false, false, false, false, false,
+                        false, false, false, false, true,
+                        false, false, false, false, false,
+                        false, false, false, false, false });
+        CHECK(!playBoard(game.boards[0], 99));
+        CHECK(game.boards[0].hits ==
+            std::array{ false, false, false, false, false,
+                        false, false, false, false, false,
+                        false, false, false, false, true,
+                        false, false, false, false, false,
+                        false, false, false, false, false });
+    }
+
     SECTION("Play Game")
     {
         CHECK(!playGame(game, game.numbers[0]));

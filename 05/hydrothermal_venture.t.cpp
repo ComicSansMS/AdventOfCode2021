@@ -25,6 +25,10 @@ TEST_CASE("Hydrothermal Venture")
         std::stringstream sstr;
         sstr << Point{ 23, -42 };
         CHECK(sstr.str() == "{ x: 23 y: -42 }");
+        CHECK(Point{ 1, 2 } == Point{ 1, 2 });
+        CHECK(!(Point{ 1, 2 } == Point{ 1, 0 }));
+        CHECK(!(Point{ 1, 2 } == Point{ 0, 2 }));
+        CHECK(!(Point{ 1, 2 } == Point{ 0, 0 }));
     }
 
     SECTION("Line")

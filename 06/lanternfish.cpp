@@ -34,9 +34,9 @@ Fishes parseInput(std::string_view input)
                 state = ParseState::AwaitNumber;
             }
             break;
-        case ParseState::Fin:
-            assert(false);
-            break;
+        case ParseState::Fin:                   // LCOV_EXCL_LINE
+            assert(false);                      // LCOV_EXCL_LINE
+            break;                              // LCOV_EXCL_LINE
         }
     }
     assert(state == ParseState::Fin);

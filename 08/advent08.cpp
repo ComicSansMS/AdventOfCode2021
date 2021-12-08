@@ -40,7 +40,7 @@ int main(int argc, char* argv[])
 
     auto const displays = parseInput(*input);
     fmt::print("First result is {}\n", result1(displays));
-    //fmt::print("Second result is {}\n", result2(crabs));
+    fmt::print("Second result is {}\n", result2(displays));
 
     return 0;
 }

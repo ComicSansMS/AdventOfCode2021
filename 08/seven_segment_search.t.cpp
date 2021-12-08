@@ -64,4 +64,83 @@ TEST_CASE("Seven Segment Search")
         CHECK(result1(parseInput(sample_input1)) == 0);
         CHECK(result1(parseInput(sample_input2)) == 26);
     }
+
+    SECTION("Is Valid Mapping")
+    {
+        CHECK(isValidMapping(Mapping{ .map = { 0, 1, 2, 3, 4, 5, 6 } }));
+        CHECK(isValidMapping(Mapping{ .map = { 6, 5, 4, 3, 2, 1, 0 } }));
+        CHECK(isValidMapping(Mapping{ .map = { 1, 0, 3, 2, 5, 4, 6 } }));
+        CHECK(isValidMapping(Mapping{ .map = { 1, 2, 3, 4, 5, 6, 0 } }));
+        CHECK(!isValidMapping(Mapping{ .map = { 1, 2, 3, 4, 5, 6, 1 } }));
+        CHECK(!isValidMapping(Mapping{ .map = { 1, 2, 3, 4, 5, 6, 7 } }));
+    }
+
+
+    SECTION("Number checking")
+    {
+
+        CHECK(!mapsTo1(Mapping{ .map = { 0, 1, 2, 3, 4, 5, 6 } }, Segment{ 0b001'0010 }));
+        CHECK(mapsTo1( Mapping{ .map = { 6, 5, 4, 3, 2, 1, 0 } }, Segment{ 0b001'0010 }));
+
+        CHECK(!mapsTo2(Mapping{ .map = { 1, 0, 2, 3, 4, 5, 6 } }, Segment{ 0b101'1101 }));
+        CHECK(mapsTo2( Mapping{ .map = { 6, 5, 4, 3, 2, 1, 0 } }, Segment{ 0b101'1101 }));
+
+        CHECK(!mapsTo3(Mapping{ .map = { 0, 1, 2, 3, 4, 5, 6 } }, Segment{ 0b101'1011 }));
+        CHECK(mapsTo3( Mapping{ .map = { 6, 5, 4, 3, 2, 1, 0 } }, Segment{ 0b101'1011 }));
+
+        CHECK(!mapsTo4(Mapping{ .map = { 0, 1, 2, 3, 4, 5, 6 } }, Segment{ 0b011'1010 }));
+        CHECK(mapsTo4( Mapping{ .map = { 6, 5, 4, 3, 2, 1, 0 } }, Segment{ 0b011'1010 }));
+
+        CHECK(!mapsTo5(Mapping{ .map = { 0, 2, 1, 3, 4, 5, 6 } }, Segment{ 0b110'1011 }));
+        CHECK(mapsTo5( Mapping{ .map = { 6, 5, 4, 3, 2, 1, 0 } }, Segment{ 0b110'1011 }));
+
+        CHECK(!mapsTo6(Mapping{ .map = { 0, 1, 2, 3, 4, 5, 6 } }, Segment{ 0b110'1111 }));
+        CHECK(mapsTo6( Mapping{ .map = { 6, 5, 4, 3, 2, 1, 0 } }, Segment{ 0b110'1111 }));
+
+        CHECK(!mapsTo7(Mapping{ .map = { 0, 1, 2, 3, 4, 5, 6 } }, Segment{ 0b101'0010 }));
+        CHECK(mapsTo7( Mapping{ .map = { 6, 5, 4, 3, 2, 1, 0 } }, Segment{ 0b101'0010 }));
+
+        CHECK(mapsTo8(Mapping{ .map = { 0, 1, 2, 3, 4, 5, 6 } }, Segment{ 0b111'1111 }));
+        CHECK(mapsTo8(Mapping{ .map = { 6, 5, 4, 3, 2, 1, 0 } }, Segment{ 0b111'1111 }));
+        CHECK(!mapsTo8(Mapping{ .map = { 6, 5, 4, 3, 2, 1, 0 } }, Segment{ 0b111'1110 }));
+
+        CHECK(!mapsTo9(Mapping{ .map = { 0, 1, 2, 3, 4, 5, 6 } }, Segment{ 0b111'1011 }));
+        CHECK(mapsTo9( Mapping{ .map = { 6, 5, 4, 3, 2, 1, 0 } }, Segment{ 0b111'1011 }));
+
+        CHECK(!mapsTo0(Mapping{ .map = { 0, 1, 3, 2, 4, 5, 6 } }, Segment{ 0b111'0111 }));
+        CHECK(mapsTo0( Mapping{ .map = { 6, 5, 4, 3, 2, 1, 0 } }, Segment{ 0b111'0111 }));
+    }
+
+    SECTION("Determine Valid Mapping")
+    {
+        std::vector<Display> displays = parseInput(sample_input1);
+        CHECK(determineValidMapping(displays[0]).map == Mapping{ .map = { 3, 2, 6, 1, 0, 5, 4 } }.map);
+    }
+
+    SECTION("Get Code")
+    {
+        {
+            std::vector<Display> displays = parseInput(sample_input1);
+            CHECK(getCode(determineValidMapping(displays[0]), displays[0]) == 5353);
+        }
+        {
+            std::vector<Display> displays = parseInput(sample_input2);
+            CHECK(getCode(determineValidMapping(displays[0]), displays[0]) == 8394);
+            CHECK(getCode(determineValidMapping(displays[1]), displays[1]) == 9781);
+            CHECK(getCode(determineValidMapping(displays[2]), displays[2]) == 1197);
+            CHECK(getCode(determineValidMapping(displays[3]), displays[3]) == 9361);
+            CHECK(getCode(determineValidMapping(displays[4]), displays[4]) == 4873);
+            CHECK(getCode(determineValidMapping(displays[5]), displays[5]) == 8418);
+            CHECK(getCode(determineValidMapping(displays[6]), displays[6]) == 4548);
+            CHECK(getCode(determineValidMapping(displays[7]), displays[7]) == 1625);
+            CHECK(getCode(determineValidMapping(displays[8]), displays[8]) == 8717);
+            CHECK(getCode(determineValidMapping(displays[9]), displays[9]) == 4315);
+        }
+    }
+
+    SECTION("Result 2")
+    {
+        CHECK(result2(parseInput(sample_input1)) == 5353);
+        CHECK(result2(parseInput(sample_input2)) == 61229);
+    }
 }

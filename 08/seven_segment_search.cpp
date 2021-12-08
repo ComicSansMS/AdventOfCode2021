@@ -1,5 +1,6 @@
 #include <seven_segment_search.hpp>
 
+#include <range/v3/algorithm/all_of.hpp>
 #include <range/v3/algorithm/count_if.hpp>
 #include <range/v3/algorithm/min.hpp>
 #include <range/v3/algorithm/permutation.hpp>
@@ -281,24 +282,14 @@ bool mapsToAnyNumber(Mapping const& m, Segment const& s)
 Mapping determineValidMapping(Display const& d)
 {
     Mapping m{ .map = { 0, 1, 2, 3, 4, 5, 6 } };
+    auto const does_map = [&m](Segment const& s) { return mapsToAnyNumber(m, s); };
     while (ranges::next_permutation(m.map)) {
-        bool isValidMapping = true;
-        for (auto const& s : d.patterns) {
-            if (!mapsToAnyNumber(m, s)) {
-                isValidMapping = false;
-                break;
-            }
+        if (ranges::all_of(d.patterns, does_map)) {
+            break;
         }
-        if (!isValidMapping) { continue; }
-        for (auto const& s : d.code) {
-            if (!mapsToAnyNumber(m, s)) {
-                isValidMapping = false;
-                break;
-            }
-        }
-        if (isValidMapping) { return m; }
     }
-    return Mapping{};
+    assert(ranges::all_of(d.code, does_map));
+    return m;
 }
 
 int64_t getDigit(Mapping const& m, Segment const& s)

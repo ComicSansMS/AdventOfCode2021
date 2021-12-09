@@ -31,6 +31,14 @@ TEST_CASE("Smoke Basin")
         CHECK(!isLowerThan4Neighbourhood(map, 9, 4));
     }
 
+    SECTION("Point Equality")
+    {
+        CHECK(Point{ .x = 1, .y = 2 } == Point{ .x = 1, .y = 2 });
+        CHECK(!(Point{ .x = 0, .y = 2 } == Point{ .x = 1, .y = 2 }));
+        CHECK(!(Point{ .x = 1, .y = 0 } == Point{ .x = 1, .y = 2 }));
+        CHECK(!(Point{ .x = 5, .y = 5 } == Point{ .x = 1, .y = 2 }));
+    }
+
     SECTION("Get Low Points")
     {
         auto points = getLowPoints(map);

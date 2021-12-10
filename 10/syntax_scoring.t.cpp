@@ -38,22 +38,22 @@ TEST_CASE("Syntax Scoring")
     {
         {
             std::stringstream sstr;
-            sstr << SyntaxCheck{ .status = SyntaxCheck::Status::Ok, .column = 42 };
+            sstr << SyntaxCheck{ .status = SyntaxCheck::Status::Ok, .column = 42, .msg = {}, .check_stack = {} };
             CHECK(sstr.str() == "{ .status = Ok, .column = 42, .msg = \"\" }");
         }
         {
             std::stringstream sstr;
-            sstr << SyntaxCheck{ .status = SyntaxCheck::Status::Error, .column = -1 };
+            sstr << SyntaxCheck{ .status = SyntaxCheck::Status::Error, .column = -1, .msg = {}, .check_stack = {} };
             CHECK(sstr.str() == "{ .status = Error, .column = -1, .msg = \"\" }");
         }
         {
             std::stringstream sstr;
-            sstr << SyntaxCheck{ .status = SyntaxCheck::Status::Incomplete, .column = 1234567890 };
+            sstr << SyntaxCheck{ .status = SyntaxCheck::Status::Incomplete, .column = 1234567890, .msg = {}, .check_stack = {} };
             CHECK(sstr.str() == "{ .status = Incomplete, .column = 1234567890, .msg = \"\" }");
         }
         {
             std::stringstream sstr;
-            sstr << SyntaxCheck{ .status = SyntaxCheck::Status::Ok, .column = 0, .msg = "foo" };
+            sstr << SyntaxCheck{ .status = SyntaxCheck::Status::Ok, .column = 0, .msg = "foo", .check_stack = {} };
             CHECK(sstr.str() == "{ .status = Ok, .column = 0, .msg = \"foo\" }");
         }
 
@@ -61,42 +61,43 @@ TEST_CASE("Syntax Scoring")
 
     SECTION("Syntax Check Equality")
     {
-        CHECK(SyntaxCheck{ .status = SyntaxCheck::Status::Ok, .column = 1, .msg = "foo" } == SyntaxCheck{ .status = SyntaxCheck::Status::Ok, .column = 1, .msg = "foo" });
-        CHECK(SyntaxCheck{ .status = SyntaxCheck::Status::Ok, .column = 1, .msg = "foo" } == SyntaxCheck{ .status = SyntaxCheck::Status::Ok, .column = 1, .msg = "bar" });
-        CHECK(!(SyntaxCheck{ .status = SyntaxCheck::Status::Ok, .column = 1, .msg = "foo" } == SyntaxCheck{ .status = SyntaxCheck::Status::Error, .column = 1, .msg = "foo" }));
-        CHECK(!(SyntaxCheck{ .status = SyntaxCheck::Status::Ok, .column = 1, .msg = "foo" } == SyntaxCheck{ .status = SyntaxCheck::Status::Ok, .column = 2, .msg = "foo" }));
-        CHECK(!(SyntaxCheck{ .status = SyntaxCheck::Status::Ok, .column = 1, .msg = "foo" } == SyntaxCheck{ .status = SyntaxCheck::Status::Error, .column = 2, .msg = "foo" }));
-        CHECK(!(SyntaxCheck{ .status = SyntaxCheck::Status::Ok, .column = 1, .msg = "foo" } == SyntaxCheck{ .status = SyntaxCheck::Status::Error, .column = 2, .msg = "bar" }));
+        CHECK(SyntaxCheck{ .status = SyntaxCheck::Status::Ok, .column = 1, .msg = "foo", .check_stack = {} } == SyntaxCheck{ .status = SyntaxCheck::Status::Ok, .column = 1, .msg = "foo", .check_stack = {} });
+        CHECK(SyntaxCheck{ .status = SyntaxCheck::Status::Ok, .column = 1, .msg = "foo", .check_stack = {} } == SyntaxCheck{ .status = SyntaxCheck::Status::Ok, .column = 1, .msg = "bar", .check_stack = {} });
+        CHECK(SyntaxCheck{ .status = SyntaxCheck::Status::Ok, .column = 1, .msg = "foo", .check_stack = {} } == SyntaxCheck{ .status = SyntaxCheck::Status::Ok, .column = 1, .msg = "bar", .check_stack = { 1 } });
+        CHECK(!(SyntaxCheck{ .status = SyntaxCheck::Status::Ok, .column = 1, .msg = "foo", .check_stack = {} } == SyntaxCheck{ .status = SyntaxCheck::Status::Error, .column = 1, .msg = "foo", .check_stack = {} }));
+        CHECK(!(SyntaxCheck{ .status = SyntaxCheck::Status::Ok, .column = 1, .msg = "foo", .check_stack = {} } == SyntaxCheck{ .status = SyntaxCheck::Status::Ok, .column = 2, .msg = "foo", .check_stack = {} }));
+        CHECK(!(SyntaxCheck{ .status = SyntaxCheck::Status::Ok, .column = 1, .msg = "foo", .check_stack = {} } == SyntaxCheck{ .status = SyntaxCheck::Status::Error, .column = 2, .msg = "foo", .check_stack = {} }));
+        CHECK(!(SyntaxCheck{ .status = SyntaxCheck::Status::Ok, .column = 1, .msg = "foo", .check_stack = {} } == SyntaxCheck{ .status = SyntaxCheck::Status::Error, .column = 2, .msg = "bar", .check_stack = {} }));
     }
 
     SECTION("Check Syntax")
     {
-        CHECK(checkSyntax("()") == SyntaxCheck{ .status = SyntaxCheck::Status::Ok, .column = 2 });
-        CHECK(checkSyntax("([])") == SyntaxCheck{ .status = SyntaxCheck::Status::Ok, .column = 4 });
-        CHECK(checkSyntax("{()()()}") == SyntaxCheck{ .status = SyntaxCheck::Status::Ok, .column = 8 });
-        CHECK(checkSyntax("<([{}])>") == SyntaxCheck{ .status = SyntaxCheck::Status::Ok, .column = 8 });
-        CHECK(checkSyntax("[<>({}){}[([])<>]]") == SyntaxCheck{ .status = SyntaxCheck::Status::Ok, .column = 18 });
-        CHECK(checkSyntax("(((((((((())))))))))") == SyntaxCheck{ .status = SyntaxCheck::Status::Ok, .column = 20 });
+        CHECK(checkSyntax("()") == SyntaxCheck{ .status = SyntaxCheck::Status::Ok, .column = 2, .msg = {}, .check_stack = {} });
+        CHECK(checkSyntax("([])") == SyntaxCheck{ .status = SyntaxCheck::Status::Ok, .column = 4, .msg = {}, .check_stack = {} });
+        CHECK(checkSyntax("{()()()}") == SyntaxCheck{ .status = SyntaxCheck::Status::Ok, .column = 8, .msg = {}, .check_stack = {} });
+        CHECK(checkSyntax("<([{}])>") == SyntaxCheck{ .status = SyntaxCheck::Status::Ok, .column = 8, .msg = {}, .check_stack = {} });
+        CHECK(checkSyntax("[<>({}){}[([])<>]]") == SyntaxCheck{ .status = SyntaxCheck::Status::Ok, .column = 18, .msg = {}, .check_stack = {} });
+        CHECK(checkSyntax("(((((((((())))))))))") == SyntaxCheck{ .status = SyntaxCheck::Status::Ok, .column = 20, .msg = {}, .check_stack = {} });
         
-        CHECK(checkSyntax("(]") == SyntaxCheck{ .status = SyntaxCheck::Status::Error, .column = 1 });
-        CHECK(checkSyntax("{()()()>") == SyntaxCheck{ .status = SyntaxCheck::Status::Error, .column = 7 });
-        CHECK(checkSyntax("(((()))}") == SyntaxCheck{ .status = SyntaxCheck::Status::Error, .column = 7 });
-        CHECK(checkSyntax("<([]){()}[{}])") == SyntaxCheck{ .status = SyntaxCheck::Status::Error, .column = 13 });
+        CHECK(checkSyntax("(]") == SyntaxCheck{ .status = SyntaxCheck::Status::Error, .column = 1, .msg = {}, .check_stack = {} });
+        CHECK(checkSyntax("{()()()>") == SyntaxCheck{ .status = SyntaxCheck::Status::Error, .column = 7, .msg = {}, .check_stack = {} });
+        CHECK(checkSyntax("(((()))}") == SyntaxCheck{ .status = SyntaxCheck::Status::Error, .column = 7, .msg = {}, .check_stack = {} });
+        CHECK(checkSyntax("<([]){()}[{}])") == SyntaxCheck{ .status = SyntaxCheck::Status::Error, .column = 13, .msg = {}, .check_stack = {} });
 
-        CHECK(checkSyntax("()()1()") == SyntaxCheck{ .status = SyntaxCheck::Status::Error, .column = 4 });
+        CHECK(checkSyntax("()()1()") == SyntaxCheck{ .status = SyntaxCheck::Status::Error, .column = 4, .msg = {}, .check_stack = {} });
 
 
-        CHECK(checkSyntax(lines[0]) == SyntaxCheck{ .status = SyntaxCheck::Status::Incomplete, .column = 24 });
-        CHECK(checkSyntax(lines[1]) == SyntaxCheck{ .status = SyntaxCheck::Status::Incomplete, .column = 22 });
-        CHECK(checkSyntax(lines[3]) == SyntaxCheck{ .status = SyntaxCheck::Status::Incomplete, .column = 23 });
-        CHECK(checkSyntax(lines[6]) == SyntaxCheck{ .status = SyntaxCheck::Status::Incomplete, .column = 23 });
-        CHECK(checkSyntax(lines[9]) == SyntaxCheck{ .status = SyntaxCheck::Status::Incomplete, .column = 24 });
+        CHECK(checkSyntax(lines[0]) == SyntaxCheck{ .status = SyntaxCheck::Status::Incomplete, .column = 24, .msg = {}, .check_stack = {} });
+        CHECK(checkSyntax(lines[1]) == SyntaxCheck{ .status = SyntaxCheck::Status::Incomplete, .column = 22, .msg = {}, .check_stack = {} });
+        CHECK(checkSyntax(lines[3]) == SyntaxCheck{ .status = SyntaxCheck::Status::Incomplete, .column = 23, .msg = {}, .check_stack = {} });
+        CHECK(checkSyntax(lines[6]) == SyntaxCheck{ .status = SyntaxCheck::Status::Incomplete, .column = 23, .msg = {}, .check_stack = {} });
+        CHECK(checkSyntax(lines[9]) == SyntaxCheck{ .status = SyntaxCheck::Status::Incomplete, .column = 24, .msg = {}, .check_stack = {} });
 
-        CHECK(checkSyntax(lines[2]) == SyntaxCheck{ .status = SyntaxCheck::Status::Error, .column = 12 });
-        CHECK(checkSyntax(lines[4]) == SyntaxCheck{ .status = SyntaxCheck::Status::Error, .column = 8 });
-        CHECK(checkSyntax(lines[5]) == SyntaxCheck{ .status = SyntaxCheck::Status::Error, .column = 7 });
-        CHECK(checkSyntax(lines[7]) == SyntaxCheck{ .status = SyntaxCheck::Status::Error, .column = 10 });
-        CHECK(checkSyntax(lines[8]) == SyntaxCheck{ .status = SyntaxCheck::Status::Error, .column = 16 });
+        CHECK(checkSyntax(lines[2]) == SyntaxCheck{ .status = SyntaxCheck::Status::Error, .column = 12, .msg = {}, .check_stack = {} });
+        CHECK(checkSyntax(lines[4]) == SyntaxCheck{ .status = SyntaxCheck::Status::Error, .column = 8, .msg = {}, .check_stack = {} });
+        CHECK(checkSyntax(lines[5]) == SyntaxCheck{ .status = SyntaxCheck::Status::Error, .column = 7, .msg = {}, .check_stack = {} });
+        CHECK(checkSyntax(lines[7]) == SyntaxCheck{ .status = SyntaxCheck::Status::Error, .column = 10, .msg = {}, .check_stack = {} });
+        CHECK(checkSyntax(lines[8]) == SyntaxCheck{ .status = SyntaxCheck::Status::Error, .column = 16, .msg = {}, .check_stack = {} });
     }
 
     SECTION("Result 1")

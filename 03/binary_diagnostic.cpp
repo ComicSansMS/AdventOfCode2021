@@ -26,7 +26,7 @@ std::array<int, 32> pincountInPosition(std::vector<ReportEntry> const& report)
 {
     std::array<int, 32> acc{};
     for (auto const& e : report) {
-        for (int i = 0; i < acc.size(); ++i) {
+        for (int i = 0; i < static_cast<int>(acc.size()); ++i) {
             acc[i] += (e[i] ? 1 : 0);
         }
     }
@@ -38,8 +38,8 @@ ReportEntry gammaBits(std::vector<ReportEntry> const& report)
 {
     std::array<int, 32> acc = pincountInPosition(report);
     ReportEntry ret{};
-    for (int i = 0; i < acc.size(); ++i) {
-        if (acc[i] > report.size() / 2) {
+    for (int i = 0; i < static_cast<int>(acc.size()); ++i) {
+        if (acc[i] > static_cast<int>(report.size()) / 2) {
             ret.set(i);
         }
     }

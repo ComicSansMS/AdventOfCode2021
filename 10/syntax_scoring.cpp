@@ -22,7 +22,7 @@ SyntaxCheck checkSyntax(std::string_view line)
 {
     SyntaxCheck ret;
     std::vector<char> check_stack;
-    for (ret.column = 0; ret.column < line.size(); ++ret.column) {
+    for (ret.column = 0; ret.column < static_cast<int>(line.size()); ++ret.column) {
         char const c = line[ret.column];
         switch (c) {
         case '(':

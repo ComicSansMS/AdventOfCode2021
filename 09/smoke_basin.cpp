@@ -103,7 +103,7 @@ Basin floodFill(Heightmap const& map, Point const& p)
     auto const isPartOfBasin = [](int c, int p) {
         return (p < 9) && (c <= p);
     };
-    while (processed < ret.points.size()) {
+    while (processed < static_cast<int>(ret.points.size())) {
         auto const [x, y] = ret.points[processed];
         int const c = getCell(map, x, y);
         if (x > 0) {

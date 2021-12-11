@@ -22,60 +22,42 @@ Map parseInput(std::string_view input)
             ret.a[iy*10 + ix] = (c - '0');
             ++ix;
         }
+        assert(ix == 10);
         ix = 0;
         ++iy;
     }
+    assert(iy == 10);
     return ret;
 }
 
 void increaseEnergy(Map& m)
 {
-    for (auto const [iy, ix] : ranges::views::cartesian_product(ranges::views::iota(0, 10), ranges::views::iota(0, 10))) {
-        ++m.a[iy*10 + ix];
+    for (int& cell : m.a) {
+        ++cell;
     }
 }
 
-void visit8Neighbourhood(Map& m, int ix, int iy, auto func)
+void visit8Neighbourhood(int ix, int iy, auto func)
 {
-    // upper left
-    if ((ix > 0) && (iy > 0)) {
-        int const index = (iy-1)*10 + (ix-1);
-        func(m.a[index], index);
-    }
-    // up
     if (iy > 0) {
-        int const index = (iy-1)*10 + ix;
-        func(m.a[index], index);
-    }
-    // upper right
-    if ((ix < 9) && (iy > 0)) {
-        int const index = (iy-1)*10 + (ix+1);
-        func(m.a[index], index);
+        // upper left
+        if (ix > 0) { func(ix - 1, iy - 1); }
+        // up
+        func(ix, iy - 1);
+        // upper right
+        if (ix < 9) { func(ix + 1, iy - 1); }
     }
     // left
-    if (ix > 0) {
-        int const index = iy*10 + (ix-1);
-        func(m.a[index], index);
-    }
+    if (ix > 0) { func(ix - 1, iy); }
     // right
-    if (ix < 9) {
-        int const index = iy*10 + (ix+1);
-        func(m.a[index], index);
-    }
-    // lower left
-    if ((ix > 0) && (iy < 9)) {
-        int const index = (iy+1)*10 + (ix-1);
-        func(m.a[index], index);
-    }
-    // low
+    if (ix < 9) { func(ix + 1, iy); }
     if (iy < 9) {
-        int const index = (iy+1)*10 + ix;
-        func(m.a[index], index);
-    }
-    // lower right
-    if ((ix < 9) && (iy < 9)) {
-        int const index = (iy+1)*10 + (ix+1);
-        func(m.a[index], index);
+        // lower left
+        if (ix > 0) { func(ix - 1, iy + 1); }
+        // low
+        func(ix, iy + 1);
+        // lower right
+        if (ix < 9) { func(ix + 1, iy + 1); }
     }
 }
 
@@ -98,11 +80,13 @@ int64_t applyFlashes(Map& m)
         int const index = iy*10 + ix;
         if (!did_flash.contains(index)) {
             did_flash.insert(index);
-            visit8Neighbourhood(m, ix, iy,
-                [&did_flash, &to_flash](int& ncell, int nindex) {
+            visit8Neighbourhood(ix, iy,
+                [&m, &did_flash, &to_flash](int nx, int ny) {
+                    int const nindex = ny*10 + nx;
+                    int& ncell = m.a[nindex];
                     ++ncell;
                     if ((ncell > 9) && (!did_flash.contains(nindex))) {
-                        to_flash.push_back(XY{ .x = nindex % 10, .y = nindex / 10 });
+                        to_flash.push_back(XY{ .x = nx, .y = ny });
                     }
                 });
         }

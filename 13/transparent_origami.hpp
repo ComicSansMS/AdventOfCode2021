@@ -14,7 +14,7 @@ struct Point {
     int x;
     int y;
 
-    friend bool operator==(Point const&, Point const&) = default;
+    friend bool operator==(Point const&, Point const&) = default;   // LCOV_EXCL_LINE
 };
 
 template <class T>

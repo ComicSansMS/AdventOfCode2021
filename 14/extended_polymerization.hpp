@@ -3,74 +3,59 @@
 
 #include <fmt/format.h>
 
-#include <array>
-#include <cassert>
 #include <cstdint>
-#include <optional>
-#include <list>
-#include <memory>
-#include <memory_resource>
 #include <string>
 #include <string_view>
-#include <unordered_set>
+#include <unordered_map>
 #include <vector>
 
+struct Rule {
+    char first;
+    char second;
 
-struct Polymer {
-    std::pmr::monotonic_buffer_resource allocator;
-    std::pmr::list<char> chain;
+    char insert;
 
-    Polymer()
-        :chain(&allocator)
-    {}
+    friend bool operator==(Rule const&, Rule const&) = default;
+};
 
-    Polymer(Polymer const& rhs)
-        :chain(rhs.chain, &allocator)
-    {}
-
-    Polymer& operator=(Polymer const& rhs) {
-        if (this != &rhs) {
-            chain = rhs.chain;
-        }
-        return *this;
-    }
-
-    operator std::string() const {
-        std::string ret;
-        ret.reserve(chain.size());
-        for (char const c : chain) { ret.push_back(c); }
-        return ret;
+struct HashRule {
+    std::size_t operator()(Rule const& r) const {
+        return (r.first << 16) | r.second;
     }
 };
 
-struct RuleLookup {
-    std::array<char, 26*26> map;
-
-    char operator()(char first, char second) const {
-        assert((first >= 'A') && (first <= 'Z'));
-        assert((second >= 'A') && (second <= 'Z'));
-        int const fi = first - 'A';
-        int const si = second - 'A';
-        return map[fi*26 + si];
-    }
+struct SplitRule {
+    Rule r1;
+    Rule r2;
 };
+
+using RuleProgression = std::unordered_map<Rule, SplitRule, HashRule>;
+using RuleCount = std::unordered_map<Rule, int64_t, HashRule>;
 
 struct Formula {
-    Polymer polymer;
-    RuleLookup insertion_rules;
+    std::string polymer;
+    std::vector<Rule> rules;
 };
 
 Formula parseInput(std::string_view input);
-
-void polymerize(Formula& f);
 
 struct OccurrenceCount {
     char c;
     int64_t count;
 };
 
-std::vector<OccurrenceCount> countOccurrences(Polymer const& p);
+std::vector<OccurrenceCount> countOccurrences(RuleCount const& rc);
 
-int64_t result1(Formula f);
+RuleProgression computeRuleProgression(Formula const& f);
+
+RuleCount computeInitialRuleCount(Formula const& f);
+
+RuleCount step(RuleCount const& rc, RuleProgression const& rp);
+
+int64_t result1(Formula const& f);
+
+int64_t result2(Formula const& f);
+
+
 
 #endif

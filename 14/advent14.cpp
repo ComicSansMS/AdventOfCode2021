@@ -40,7 +40,7 @@ int main(int argc, char* argv[])
 
     auto const formula = parseInput(*input);
     fmt::print("First result is {}\n", result1(formula));
-    //fmt::print("Second result is\n{}\n", foldAll(transparency));
+    fmt::print("Second result is {}\n", result2(formula));
 
     return 0;
 }

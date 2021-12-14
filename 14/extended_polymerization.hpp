@@ -15,14 +15,16 @@ struct Rule {
 
     char insert;
 
-    friend bool operator==(Rule const&, Rule const&) = default;
+    friend bool operator==(Rule const&, Rule const&) = default;     // LCOV_EXCL_LINE
 };
 
+// LCOV_EXCL_START
 struct HashRule {
     std::size_t operator()(Rule const& r) const {
         return (r.first << 16) | r.second;
     }
 };
+// LCOV_EXCL_STOP
 
 struct SplitRule {
     Rule r1;

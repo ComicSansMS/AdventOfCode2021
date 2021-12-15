@@ -87,9 +87,7 @@ int shortestPath(Map const& m)
                 Node& neighbour = nodes[neighbour_index];
                 int const new_cost = m.m[neighbour_index] + n.distance;
                 if (new_cost < neighbour.distance) {
-                    if (neighbour.distance < std::numeric_limits<int>::max()) {
-                        unvisited.erase(std::lower_bound(begin(unvisited), end(unvisited), UnvisitedNodes{ .distance = neighbour.distance, .index = neighbour_index }));
-                    }
+                    assert(neighbour.distance == std::numeric_limits<int>::max());
                     neighbour.distance = new_cost;
                     UnvisitedNodes const uv{ .distance = new_cost, .index = neighbour_index };
                     unvisited.insert(std::upper_bound(begin(unvisited), end(unvisited), uv), uv);

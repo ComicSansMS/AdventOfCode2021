@@ -6,7 +6,6 @@
 
 #include <algorithm>
 #include <cassert>
-#include <deque>
 #include <limits>
 
 Map parseInput(std::string_view input)
@@ -73,7 +72,7 @@ int shortestPath(Map const& m)
     };
     std::vector<Node> nodes(m.m.size());
     nodes[0].distance = 0;
-    std::deque<UnvisitedNodes> unvisited;
+    std::vector<UnvisitedNodes> unvisited;
     unvisited.push_back(UnvisitedNodes{ .distance = 0, .index = 0 });
     while (!unvisited.empty()) {
         int const index = unvisited.front().index;
@@ -81,7 +80,7 @@ int shortestPath(Map const& m)
         int const x = index % m.width;
         int const y = index / m.width;
         n.visited = true;
-        unvisited.pop_front();
+        unvisited.erase(unvisited.begin());
         visit4Neighbourhood(m, x, y, [&](int nx, int ny) {
                 int const neighbour_index = getIndex(m, nx, ny);
                 Node& neighbour = nodes[neighbour_index];

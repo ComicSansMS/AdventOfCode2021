@@ -65,7 +65,11 @@ struct fmt::formatter<Transparency>
                 if (fold && (((fold->axis == Fold::Axis::X) && (fold->coordinate == ix)) ||
                              ((fold->axis == Fold::Axis::Y) && (fold->coordinate == iy))))
                 {
-                    fmt::format_to(ctx.out(), ((fold->axis == Fold::Axis::X) ? "|" : "-"));
+                    if (fold->axis == Fold::Axis::X) {
+                        fmt::format_to(ctx.out(), "|");
+                    } else {
+                        fmt::format_to(ctx.out(), "-");
+                    }
                 } else if (tp.points.contains(Point{ .x = ix, .y = iy })) {
                     fmt::format_to(ctx.out(), "#");
                 } else {

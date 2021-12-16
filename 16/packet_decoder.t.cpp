@@ -6,23 +6,9 @@
 
 TEST_CASE("Packet Decoder")
 {
-    char const sample_input2[] = "EE00D40C823060";
-    char const sample_input3[] = "8A004A801A8002F478";
-    char const sample_input4[] = "620080001611562C8802118E34";
-    char const sample_input5[] = "C0015000016115A2E0802F182340";
-    char const sample_input6[] = "A0016C880162017C3686B18A3D4780";
-
-    
-    auto raw_data2 = parseInput(sample_input2);
-    auto raw_data3 = parseInput(sample_input3);
-    auto raw_data4 = parseInput(sample_input4);
-    auto raw_data5 = parseInput(sample_input5);
-    auto raw_data6 = parseInput(sample_input6);
-
-
     SECTION("Parse Input")
     {
-        auto raw_data = parseInput("38006F45291200");
+        auto raw_data = parseInput("38006F45291200\n");
         CHECK(raw_data.offset == 0);
         REQUIRE(raw_data.d.size() == 7);
         CHECK(raw_data.d[0] == static_cast<std::byte>(0x38));

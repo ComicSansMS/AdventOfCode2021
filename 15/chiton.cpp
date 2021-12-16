@@ -92,7 +92,7 @@ int shortestPath(Map const& m)
                     unvisited.insert(std::upper_bound(begin(unvisited), end(unvisited), uv), uv);
                 }
             });
-        if (index == nodes.size() - 1) { break; }
+        if (index == static_cast<int>(nodes.size()) - 1) { break; }
     }
 
     return nodes.back().distance;

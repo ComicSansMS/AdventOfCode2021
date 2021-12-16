@@ -71,7 +71,7 @@ TEST_CASE("Packet Decoder")
         {
             auto const packet = decode(parseInput("38006F45291200"));
             CHECK(packet.header.version == 1);
-            CHECK(packet.header.type_id == Header::Type::Operator6);
+            CHECK(packet.header.type_id == Header::Type::OpLT);
             auto const& sub_packets = std::get<Operator>(packet.data).sub_packets;
             REQUIRE(sub_packets.size() == 2);
             checkLiteral(sub_packets[0], 6, 10);
@@ -80,7 +80,7 @@ TEST_CASE("Packet Decoder")
         {
             auto const packet = decode(parseInput("EE00D40C823060"));
             CHECK(packet.header.version == 7);
-            CHECK(packet.header.type_id == Header::Type::Operator3);
+            CHECK(packet.header.type_id == Header::Type::OpMax);
             auto const& sub_packets = std::get<Operator>(packet.data).sub_packets;
             REQUIRE(sub_packets.size() == 3);
             checkLiteral(sub_packets[0], 2, 1);
@@ -90,15 +90,15 @@ TEST_CASE("Packet Decoder")
         {
             auto const packet = decode(parseInput("8A004A801A8002F478"));
             CHECK(packet.header.version == 4);
-            CHECK(packet.header.type_id == Header::Type::Operator2);
+            CHECK(packet.header.type_id == Header::Type::OpMin);
             auto const& sub_packets = std::get<Operator>(packet.data).sub_packets;
             REQUIRE(sub_packets.size() == 1);
             CHECK(sub_packets[0].header.version == 1);
-            CHECK(sub_packets[0].header.type_id == Header::Type::Operator2);
+            CHECK(sub_packets[0].header.type_id == Header::Type::OpMin);
             auto const& sub_sub_packets = std::get<Operator>(sub_packets[0].data).sub_packets;
             REQUIRE(sub_sub_packets.size() == 1);
             CHECK(sub_sub_packets[0].header.version == 5);
-            CHECK(sub_sub_packets[0].header.type_id == Header::Type::Operator2);
+            CHECK(sub_sub_packets[0].header.type_id == Header::Type::OpMin);
             auto const& sub_sub_sub_packets = std::get<Operator>(sub_sub_packets[0].data).sub_packets;
             REQUIRE(sub_sub_sub_packets.size() == 1);
             checkLiteral(sub_sub_sub_packets[0], 6, 15);
@@ -111,5 +111,17 @@ TEST_CASE("Packet Decoder")
         CHECK(addVersionNumbers(decode(parseInput("620080001611562C8802118E34"))) == 12);
         CHECK(addVersionNumbers(decode(parseInput("C0015000016115A2E0802F182340"))) == 23);
         CHECK(addVersionNumbers(decode(parseInput("A0016C880162017C3686B18A3D4780"))) == 31);
+    }
+
+    SECTION("Evaluate")
+    {
+        CHECK(evaluate(decode(parseInput("C200B40A82"))) == 3);
+        CHECK(evaluate(decode(parseInput("04005AC33890"))) == 54);
+        CHECK(evaluate(decode(parseInput("880086C3E88112"))) == 7);
+        CHECK(evaluate(decode(parseInput("CE00C43D881120"))) == 9);
+        CHECK(evaluate(decode(parseInput("D8005AC2A8F0"))) == 1);
+        CHECK(evaluate(decode(parseInput("F600BC2D8F"))) == 0);
+        CHECK(evaluate(decode(parseInput("9C005AC2F8F0"))) == 0);
+        CHECK(evaluate(decode(parseInput("9C0141080250320F1802104A08"))) == 1);
     }
 }

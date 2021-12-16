@@ -4,7 +4,7 @@
 
 #include <sstream>
 
-TEST_CASE("Transparent Origami")
+TEST_CASE("Chiton")
 {
     char const sample_input[] = "1163751742" "\n"
                                 "1381373672" "\n"

@@ -4,7 +4,7 @@
 
 #include <sstream>
 
-TEST_CASE("Transparent Origami")
+TEST_CASE("Extended Polymerization")
 {
     char const sample_input[] = "NNCB"  "\n"
                                 ""      "\n"

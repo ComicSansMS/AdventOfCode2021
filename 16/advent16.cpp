@@ -41,7 +41,7 @@ int main(int argc, char* argv[])
     auto const raw_data = parseInput(*input);
     auto const p = decode(raw_data);
     fmt::print("First result is {}\n", addVersionNumbers(p));
-    //fmt::print("Second result is {}\n", shortestPath(expandMap(map)));
+    fmt::print("Second result is {}\n", evaluate(p));
 
     return 0;
 }

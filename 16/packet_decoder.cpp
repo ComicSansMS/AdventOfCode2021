@@ -1,5 +1,8 @@
 #include <packet_decoder.hpp>
 
+#include <range/v3/algorithm/max.hpp>
+#include <range/v3/algorithm/min.hpp>
+#include <range/v3/numeric/accumulate.hpp>
 #include <range/v3/range/conversion.hpp>
 #include <range/v3/range/primitives.hpp>
 #include <range/v3/view/split.hpp>
@@ -155,4 +158,61 @@ int32_t AddVersionNumbersPacketVisitor::operator()(Operator const& op) const
 int32_t addVersionNumbers(Packet const& p)
 {
     return addVersionNumbers_rec(p);
+}
+
+class EvaluateVisitor {
+private:
+    Header::Type m_type;
+public:
+    EvaluateVisitor(Header::Type type) : m_type(type) {}
+
+    int64_t operator()(Literal const&) const;
+
+    int64_t operator()(Operator const& op) const;
+};
+
+int64_t evaluate_rec(Packet const& p)
+{
+    return std::visit(EvaluateVisitor{ p.header.type_id }, p.data);
+}
+
+int64_t EvaluateVisitor::operator()(Literal const& l) const
+{
+    assert(m_type == Header::Type::Literal);
+    return l.n;
+}
+
+int64_t EvaluateVisitor::operator()(Operator const& op) const
+{
+    std::vector<int64_t> args;
+    args.reserve(op.sub_packets.size());
+    for (auto const sp : op.sub_packets) {
+        args.push_back(evaluate_rec(sp));
+    }
+
+    if (m_type == Header::Type::OpAdd) {
+        return ranges::accumulate(args, static_cast<int64_t>(0));
+    } else if (m_type == Header::Type::OpMul) {
+        return ranges::accumulate(args, static_cast<int64_t>(1), ranges::multiplies{});
+    } else if (m_type == Header::Type::OpMin) {
+        return ranges::min(args);
+    } else if (m_type == Header::Type::OpMax) {
+        return ranges::max(args);
+    } else if (m_type == Header::Type::OpGT) {
+        assert(args.size() == 2);
+        return (args[0] > args[1]) ? 1 : 0;
+    } else if (m_type == Header::Type::OpLT) {
+        assert(args.size() == 2);
+        return (args[0] < args[1]) ? 1 : 0;
+    } else {
+        assert(m_type == Header::Type::OpEq);
+        assert(args.size() == 2);
+        return (args[0] == args[1]) ? 1 : 0;
+    }
+}
+
+
+int64_t evaluate(Packet const& p)
+{
+    return evaluate_rec(p);
 }

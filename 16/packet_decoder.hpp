@@ -21,14 +21,14 @@ RawData parseInput(std::string_view input);
 struct Header {
     uint8_t version;
     enum class Type : uint8_t {
-        Operator0 = 0,
-        Operator1 = 1,
-        Operator2 = 2,
-        Operator3 = 3,
+        OpAdd = 0,
+        OpMul = 1,
+        OpMin = 2,
+        OpMax = 3,
         Literal   = 4,
-        Operator5 = 5,
-        Operator6 = 6,
-        Operator7 = 7,
+        OpGT = 5,
+        OpLT = 6,
+        OpEq = 7,
     } type_id;
 };
 
@@ -52,5 +52,7 @@ struct Packet {
 Packet decode(RawData raw_data);
 
 int32_t addVersionNumbers(Packet const& p);
+
+int64_t evaluate(Packet const& p);
 
 #endif

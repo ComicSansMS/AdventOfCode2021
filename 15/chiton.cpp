@@ -57,7 +57,6 @@ namespace {
 struct UnvisitedNodes {
     int distance;
     int index;
-    friend bool operator==(UnvisitedNodes const&, UnvisitedNodes const&) = default;
     friend bool operator<(UnvisitedNodes const& lhs, UnvisitedNodes const& rhs) {
         return lhs.distance < rhs.distance;
     }

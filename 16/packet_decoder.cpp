@@ -9,6 +9,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <iterator>
 #include <limits>
 
 RawData parseInput(std::string_view input)
@@ -186,9 +187,7 @@ int64_t EvaluateVisitor::operator()(Operator const& op) const
 {
     std::vector<int64_t> args;
     args.reserve(op.sub_packets.size());
-    for (auto const sp : op.sub_packets) {
-        args.push_back(evaluate_rec(sp));
-    }
+    std::transform(begin(op.sub_packets), end(op.sub_packets), back_inserter(args), evaluate_rec);
 
     if (m_type == Header::Type::OpAdd) {
         return ranges::accumulate(args, static_cast<int64_t>(0));

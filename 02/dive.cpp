@@ -9,8 +9,9 @@
 
 std::vector<Command> parseInput(std::string_view input)
 {
-    return ranges::to<std::vector<Command>>(input | ranges::views::split('\n') |
-        ranges::views::transform([](auto inrng) -> Command {
+    return input
+        | ranges::views::split('\n')
+        | ranges::views::transform([](auto inrng) -> Command {
             std::string const str = ranges::to<std::string>(inrng);
             char const str_forward[] = "forward ";
             char const str_down[] = "down ";
@@ -26,7 +27,8 @@ std::vector<Command> parseInput(std::string_view input)
                 int64_t const n = std::stoi(str.substr(sizeof(str_up) - 1));
                 return Up{ .n = n };
             }
-        }));
+        })
+        | ranges::to<std::vector>;
 }
 
 void courseCommand(Position& pos, Forward const& f)

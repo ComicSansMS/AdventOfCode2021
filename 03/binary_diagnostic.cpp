@@ -62,16 +62,10 @@ void filterO2Candidate(std::vector<ReportEntry>& candidates, int64_t position)
     int const zero_bits = static_cast<int>(candidates.size()) - one_bits;
     if (one_bits >= zero_bits) {
         // keep 1s
-        auto const it = std::remove_if(begin(candidates), end(candidates), [position](ReportEntry const& e) -> bool {
-                return !(e[position]);
-            });
-        candidates.erase(it, end(candidates));
+        erase_if(candidates, [position](ReportEntry const& e) -> bool { return !(e[position]); });
     } else {
         // keep 0s
-        auto const it = std::remove_if(begin(candidates), end(candidates), [position](ReportEntry const& e) -> bool {
-                return e[position];
-            });
-        candidates.erase(it, end(candidates));
+        erase_if(candidates, [position](ReportEntry const& e) -> bool { return e[position]; });
     }
 }
 
@@ -93,16 +87,10 @@ void filterCO2Candidate(std::vector<ReportEntry>& candidates, int64_t position)
     int const zero_bits = static_cast<int>(candidates.size()) - one_bits;
     if (one_bits >= zero_bits) {
         // keep 0s
-        auto const it = std::remove_if(begin(candidates), end(candidates), [position](ReportEntry const& e) -> bool {
-                return e[position];
-            });
-        candidates.erase(it, end(candidates));
+        erase_if(candidates, [position](ReportEntry const& e) -> bool { return e[position]; });
     } else {
         // keep 1s
-        auto const it = std::remove_if(begin(candidates), end(candidates), [position](ReportEntry const& e) -> bool {
-                return !(e[position]);
-            });
-        candidates.erase(it, end(candidates));
+        erase_if(candidates, [position](ReportEntry const& e) -> bool { return !(e[position]); });
     }
 }
 

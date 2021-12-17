@@ -5,7 +5,11 @@
 #include <range/v3/numeric/accumulate.hpp>
 #include <range/v3/range/conversion.hpp>
 #include <range/v3/range/primitives.hpp>
-#include <range/v3/view/split.hpp>
+#include <range/v3/view/drop.hpp>
+#include <range/v3/view/generate_n.hpp>
+#include <range/v3/view/stride.hpp>
+#include <range/v3/view/transform.hpp>
+#include <range/v3/view/zip.hpp>
 
 #include <algorithm>
 #include <cassert>
@@ -14,7 +18,7 @@
 
 RawData parseInput(std::string_view input)
 {
-    auto decode_hex = [](char c) -> std::byte {
+    auto const decode_hex = [](char c) -> std::byte {
         if ((c >= '0') && (c <= '9')) {
             return static_cast<std::byte>(c - '0');
         } else {
@@ -22,19 +26,18 @@ RawData parseInput(std::string_view input)
             return static_cast<std::byte>((c - 'A') + 10);
         }
     };
+    if (input.back() == '\n') { input = input.substr(0, input.size() - 1); }
     RawData ret{};
-    for (std::size_t i = 0; i < input.size(); ++i) {
-        if (input[i] == '\n') {
-            assert(i == input.size() - 1);
-            break;
-        }
-        std::byte const upper_nibble = decode_hex(input[i]);
-        ++i;
-        assert(i < input.size());
-        std::byte const lower_nibble = decode_hex(input[i]);
-        std::byte const byte = (upper_nibble << 4) | lower_nibble;
-        ret.d.push_back(byte);
-    }
+    auto even_elements = input | ranges::views::stride(2);
+    auto odd_elements = input | ranges::views::drop(1) | ranges::views::stride(2);
+    ret.d = ranges::views::zip(even_elements, odd_elements)
+        | ranges::views::transform([decode_hex](auto const& p) -> std::byte {
+                auto const [upper_nibble, lower_nibble] = p;
+                std::byte const u = decode_hex(upper_nibble);
+                std::byte const l = decode_hex(lower_nibble);
+                return (u << 4) | l;
+            })
+        | ranges::to<std::vector>;
     return ret;
 }
 
@@ -120,9 +123,8 @@ std::vector<Packet> decodeSubPackets(RawData& raw_data)
     } else {
         assert(length_type_id == 1);
         int32_t const number_sub_packets = raw_data.extractBits(11);
-        for (int32_t i = 0; i < number_sub_packets; ++i) {
-            ret.push_back(decodePacket(raw_data));
-        }
+        ret = ranges::views::generate_n([&raw_data]() { return decodePacket(raw_data); }, number_sub_packets)
+            | ranges::to<std::vector>;
     }
     return ret;
 }
@@ -148,12 +150,7 @@ int32_t addVersionNumbers_rec(Packet const& p)
 
 int32_t AddVersionNumbersPacketVisitor::operator()(Operator const& op) const
 {
-    int32_t acc = 0;
-    for (auto const& p : op.sub_packets)
-    {
-        acc += addVersionNumbers_rec(p);
-    }
-    return acc;
+    return ranges::accumulate(op.sub_packets, 0, ranges::plus{}, addVersionNumbers_rec);
 }
 
 int32_t addVersionNumbers(Packet const& p)
@@ -185,9 +182,9 @@ int64_t EvaluateVisitor::operator()(Literal const& l) const
 
 int64_t EvaluateVisitor::operator()(Operator const& op) const
 {
-    std::vector<int64_t> args;
-    args.reserve(op.sub_packets.size());
-    std::transform(begin(op.sub_packets), end(op.sub_packets), back_inserter(args), evaluate_rec);
+    std::vector<int64_t> args = op.sub_packets
+        | ranges::views::transform(evaluate_rec)
+        | ranges::to<std::vector>;
 
     if (m_type == Header::Type::OpAdd) {
         return ranges::accumulate(args, static_cast<int64_t>(0));

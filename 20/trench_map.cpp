@@ -73,7 +73,7 @@ int16_t neigbourhood2Number(Image const& input, Point const& p, bool out_of_boun
     auto const max = input.max;
     for (auto const n : neighbours) {
         ret <<= 1;
-        if ((n.x >= input.min.x) && (n.x <= input.max.x) && (n.y >= input.min.y) && (n.y <= input.max.y)) {
+        if ((n.x >= min.x) && (n.x <= max.x) && (n.y >= min.y) && (n.y <= max.y)) {
             if (points.contains(n)) {
                 ret |= 0x1;
             }

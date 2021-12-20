@@ -236,10 +236,14 @@ TEST_CASE("Beacon Scanner")
 
     SECTION("Match Scans")
     {
+        Scan c0 = scans[0];
         Scan c1 = scans[1];
-        CHECK(matchScans(scans[0], c1));
+        computeAllTransforms(c0);
+        computeAllTransforms(c1);
+        CHECK(matchScans(c0, c1));
         CHECK(c1.scanOffset == Vector3{ .x = 68, .y = -1246, .z = -43 });
         Scan c4 = scans[4];
+        computeAllTransforms(c4);
         CHECK(matchScans(c1, c4));
         CHECK(c4.scanOffset == Vector3{ .x = -20, .y = -1133, .z = 1061 });
     }

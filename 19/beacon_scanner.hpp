@@ -3,12 +3,14 @@
 
 #include <fmt/format.h>
 
+#include <array>
 #include <cstdint>
 #include <memory>
 #include <memory_resource>
 #include <ostream>
 #include <optional>
 #include <string_view>
+#include <unordered_set>
 #include <variant>
 #include <vector>
 
@@ -74,6 +76,7 @@ struct Scan {
     Vector3 scanOffset;
     int transformationIndex;
     std::vector<Vector3> beacons;
+    std::array<std::vector<Vector3>, 24> transformed_beacons;
 };
 
 std::vector<Scan> parseInput(std::string_view input);
@@ -83,6 +86,8 @@ bool isInRange(Vector3 const& scanner, Vector3 const& beacon);
 bool findOffset(Scan const& ref, Scan& candidate, int match_limit);
 
 Scan transformScan(Scan const& s, int transformation_index);
+
+void computeAllTransforms(Scan& s);
 
 bool matchScans(Scan const& ref, Scan& candidate);
 

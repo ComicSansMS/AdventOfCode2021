@@ -16,8 +16,7 @@
 #include <limits>
 #include <optional>
 #include <regex>
-#include <unordered_map>
-#include <unordered_set>
+
 
 std::vector<Scan> parseInput(std::string_view input)
 {
@@ -168,6 +167,29 @@ bool findOffset(Scan const& ref, Scan& candidate, int match_limit)
     return false;
 }
 
+bool findOffset(Scan const& ref, Scan& candidate, int transformation_index, int match_limit)
+{
+    auto const rng_ri = ranges::views::ints(std::size_t{ 0 }, ref.beacons.size());
+    auto const rng_ci = ranges::views::ints(std::size_t{ 0 }, candidate.beacons.size());
+    auto const mismatch_limit = static_cast<int>(candidate.beacons.size()) - match_limit;
+    for (auto const [ri, ci] : ranges::views::cartesian_product(rng_ri, rng_ci)) {
+        Vector3 const offset = ref.beacons[ri] - candidate.transformed_beacons[transformation_index][ci];
+        int count = 0;
+        int mismatches = 0;
+        auto rng_candidate_offset = candidate.transformed_beacons[transformation_index] | ranges::views::transform([&offset](Vector3 const& v) -> Vector3 { return v + offset; });
+        for (Vector3 const& v : rng_candidate_offset) {
+            if (ranges::find(ref.beacons, v) != ranges::end(ref.beacons)) { ++count; } else { ++mismatches; }
+            if ((count >= match_limit) || (mismatches > mismatch_limit)) { break; }
+        }
+        if (count >= match_limit) {
+            candidate.scanOffset = ref.scanOffset + offset;
+            return true;
+        }
+    }
+    return false;
+}
+
+
 Scan transformScan(Scan const& s, int transformation_index)
 {
     auto constexpr const transforms = transformations();
@@ -186,6 +208,7 @@ bool matchScans(Scan const& ref, Scan& candidate)
 {
     auto constexpr const n_transformations = transformations().size();
     for (int i = 0; i < static_cast<int>(n_transformations); ++i) {
+        //*
         Scan ts = transformScan(candidate, i);
         ts.scanOffset = Vector3{};
         if (findOffset(ref, ts, 12)) {
@@ -193,29 +216,56 @@ bool matchScans(Scan const& ref, Scan& candidate)
             candidate = ts;
             return true;
         }
+        /*/
+        candidate.scanOffset = Vector3{};
+        if (findOffset(ref, candidate, i, 12)) {
+            assert(!(candidate.scanOffset == Vector3{}));
+            candidate.beacons = candidate.transformed_beacons[i];
+            return true;
+        }
+        //*/
     }
     return false;
 }
 
+void computeAllTransforms(Scan& s)
+{
+    auto constexpr const ts = transformations();
+    for (int i = 0; i < ts.size(); ++i) {
+        s.transformed_beacons[i].reserve(s.beacons.size());
+    }
+    for (auto const& b : s.beacons) {
+        for (int i = 0; i < ts.size(); ++i) {
+            Vector3 const tb = transform(ts[i], b);
+            s.transformed_beacons[i].push_back(tb);
+        }
+    }
+}
+
 std::vector<Scan> matchAllScans(std::vector<Scan> scans)
 {
+    for (auto& s : scans) {
+        computeAllTransforms(s);
+    }
     std::vector<Scan> matched_scans;
     matched_scans.push_back(std::move(scans[0]));
     scans.erase(scans.begin());
+    std::size_t match_index = 0;
     while (!scans.empty()) {
         // try to find new match
         bool found_match = false;
-        for (auto const& m : matched_scans) {
+        for (std::size_t m_i = 0; m_i < matched_scans.size(); ++m_i) {
+            auto const& m = matched_scans[m_i];
             for (auto it_c = begin(scans), it_c_end = end(scans); it_c != it_c_end; ++it_c) {
                 Scan& c = *it_c;
                 if (matchScans(m, c)) {
                     matched_scans.emplace_back(std::move(c));
                     scans.erase(it_c);
+                    //fmt::print("Matched {} with {}\n", m_i, std::distance(begin(scans), it_c));
                     found_match = true;
                     break;
                 }
             }
-            if (found_match) { break; }
         }
     }
     return matched_scans;

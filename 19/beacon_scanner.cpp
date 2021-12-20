@@ -198,7 +198,6 @@ std::vector<Scan> matchAllScans(std::vector<Scan> scans)
     scans.erase(scans.begin());
     while (!scans.empty()) {
         // try to find new match
-        bool found_match = false;
         for (std::size_t m_i = 0; m_i < matched_scans.size(); ++m_i) {
             auto const& m = matched_scans[m_i];
             for (auto it_c = begin(scans), it_c_end = end(scans); it_c != it_c_end; ++it_c) {
@@ -207,7 +206,6 @@ std::vector<Scan> matchAllScans(std::vector<Scan> scans)
                     matched_scans.emplace_back(std::move(c));
                     scans.erase(it_c);
                     //fmt::print("Matched {} with {}\n", m_i, std::distance(begin(scans), it_c));
-                    found_match = true;
                     break;
                 }
             }

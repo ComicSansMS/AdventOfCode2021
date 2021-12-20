@@ -40,10 +40,10 @@ int main(int argc, char* argv[])
     }
 
     auto const scans = parseInput(*input);
-    auto const t0 = std::chrono::steady_clock::now();
+    //auto const t0 = std::chrono::steady_clock::now();
     auto const matched_scans = matchAllScans(scans);
-    auto const t1 = std::chrono::steady_clock::now();
-    fmt::print("Matching took {}ms.\n", std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count());
+    //auto const t1 = std::chrono::steady_clock::now();
+    //fmt::print("Matching took {}ms.\n", std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count());
     fmt::print("First result is {}\n", countBeacons(matched_scans));
     fmt::print("Second result is {}\n", largestDistance(matched_scans));
 

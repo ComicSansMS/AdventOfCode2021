@@ -32,6 +32,14 @@ TEST_CASE("Trench Map")
                                         "..###" "\n");
     }
 
+    SECTION("Point")
+    {
+        CHECK(Point{ .x = 1, .y = 2 } == Point{ .x = 1, .y = 2 });
+        CHECK(!(Point{ .x = 1, .y = 2 } == Point{ .x = 1, .y = 0 }));
+        CHECK(!(Point{ .x = 1, .y = 2 } == Point{ .x = 0, .y = 2 }));
+        CHECK(!(Point{ .x = 1, .y = 2 } == Point{ .x = 2, .y = 1 }));
+    }
+
     SECTION("Neighbourhood to Number")
     {
         CHECK(neigbourhood2Number(img, Point{ .x = 2, .y = 2 }, true) == 34);

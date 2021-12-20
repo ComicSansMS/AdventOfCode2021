@@ -2,6 +2,8 @@
 
 #include <catch.hpp>
 
+#include <sstream>
+
 TEST_CASE("Beacon Scanner")
 {
     char const sample_input[] =
@@ -171,7 +173,9 @@ TEST_CASE("Beacon Scanner")
 
     SECTION("Vector3")
     {
-        CHECK(fmt::format("{}", Vector3{ .x = 1, .y = -2, .z = 33 }) == "{ 1, -2, 33 }");
+        std::stringstream sstr;
+        sstr << Vector3{ .x = 1, .y = -2, .z = 33 };
+        CHECK(sstr.str() == "{ 1, -2, 33 }");
     }
 
     SECTION("Is in Range")

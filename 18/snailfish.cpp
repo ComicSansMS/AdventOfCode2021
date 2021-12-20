@@ -101,9 +101,9 @@ int64_t getNumber(Element const& e)
             return n.n;
         }
 
-        int64_t operator()(PairPtr const&) {
-            return -99;
-        }
+        int64_t operator()(PairPtr const&) {    // LCOV_EXCL_LINE
+            return -99;                         // LCOV_EXCL_LINE
+        }                                       // LCOV_EXCL_LINE
     };
     return std::visit(ExtractNumberVisitor{}, e);
 }
@@ -111,9 +111,9 @@ int64_t getNumber(Element const& e)
 Pair* getPair(Element const& e)
 {
     struct ExtractPairVisitor {
-        Pair* operator()(Number const&) {
-            return nullptr;
-        }
+        Pair* operator()(Number const&) {       // LCOV_EXCL_LINE
+            return nullptr;                     // LCOV_EXCL_LINE
+        }                                       // LCOV_EXCL_LINE
 
         Pair* operator()(PairPtr const& p) {
             return p.get();

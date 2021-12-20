@@ -77,9 +77,9 @@ inline constexpr Mat3 mul(Mat3 const& lhs, Mat3 const& rhs) noexcept {
 }
 
 inline constexpr Vector3 transform(Mat3 const& m, Vector3 const& v) noexcept {
-    return Vector3(m.m11*v.x + m.m12*v.y + m.m13*v.z,
-                   m.m21*v.x + m.m22*v.y + m.m23*v.z,
-                   m.m31*v.x + m.m32*v.y + m.m33*v.z);
+    return Vector3{ .x = m.m11*v.x + m.m12*v.y + m.m13*v.z,
+                    .y = m.m21*v.x + m.m22*v.y + m.m23*v.z,
+                    .z = m.m31*v.x + m.m32*v.y + m.m33*v.z };
 }
 
 constexpr std::array<Mat3, 24> transformations()
@@ -130,8 +130,8 @@ constexpr std::array<Mat3, 24> transformations()
         ret[i * 4 + 2] = mul(dir2, rot[i]);
         ret[i * 4 + 3] = mul(dir3, rot[i]);
     }
-    for (int i = 0; i < ret.size(); ++i) {
-        for (int j = 0; j < ret.size(); ++j) {
+    for (std::size_t i = 0; i < ret.size(); ++i) {
+        for (std::size_t j = 0; j < ret.size(); ++j) {
             assert((i == j) || (!(ret[i] == ret[j])));
         }
     }
@@ -171,7 +171,7 @@ Scan transformScan(Scan const& s, int transformation_index)
 {
     auto constexpr const transforms = transformations();
     assert(s.transformationIndex == -1);
-    assert((transformation_index >= 0) && (transformation_index < transforms.size()));
+    assert((transformation_index >= 0) && (transformation_index < static_cast<int>(transforms.size())));
     Mat3 const t = transforms[transformation_index];
     Scan ret = s;
     ret.transformationIndex = transformation_index;

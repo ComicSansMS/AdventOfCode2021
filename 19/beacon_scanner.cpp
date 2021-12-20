@@ -150,15 +150,16 @@ bool findOffset(Scan const& ref, Scan& candidate, int match_limit)
 {
     auto const rng_ri = ranges::views::ints(std::size_t{ 0 }, ref.beacons.size());
     auto const rng_ci = ranges::views::ints(std::size_t{ 0 }, candidate.beacons.size());
+    auto const mismatch_limit = static_cast<int>(candidate.beacons.size()) - match_limit;
     for (auto const [ri, ci] : ranges::views::cartesian_product(rng_ri, rng_ci)) {
         Vector3 const offset = ref.beacons[ri] - candidate.beacons[ci];
         int count = 0;
+        int mismatches = 0;
         auto rng_candidate_offset = candidate.beacons | ranges::views::transform([&offset](Vector3 const& v) -> Vector3 { return v + offset; });
         for (Vector3 const& v : rng_candidate_offset) {
-            if (ranges::find(ref.beacons, v) != ranges::end(ref.beacons)) { ++count; }
-            if (count >= match_limit) { break; }
+            if (ranges::find(ref.beacons, v) != ranges::end(ref.beacons)) { ++count; } else { ++mismatches; }
+            if ((count >= match_limit) || (mismatches > mismatch_limit)) { break; }
         }
-        assert(count >= 1);
         if (count >= match_limit) {
             candidate.scanOffset = ref.scanOffset + offset;
             return true;

@@ -82,8 +82,12 @@ int64_t result2(Board b)
         auto& new_states = states_map.back();
         for (auto const& [old_state, multiplier] : last_states) {
             for (auto const& roll1 : rolls) {
+                int const new_p1 = movePlayer(old_state.p1_pos, roll1.die_sum, 0, 0);
+                if (old_state.p1_score + new_p1 >= 21) {
+                    total_wins_p1 += multiplier * roll1.count;
+                    continue;
+                }
                 for (auto const& roll2 : rolls) {
-                    int const new_p1 = movePlayer(old_state.p1_pos, roll1.die_sum, 0, 0);
                     int const new_p2 = movePlayer(old_state.p2_pos, roll2.die_sum, 0, 0);
                     State new_state{
                         .p1_pos = new_p1,
@@ -91,9 +95,8 @@ int64_t result2(Board b)
                         .p1_score = old_state.p1_score + new_p1,
                         .p2_score = old_state.p2_score + new_p2,
                     };
-                    if (new_state.p1_score >= 21) {
-                        total_wins_p1 += multiplier * roll1.count;
-                    } else if (new_state.p2_score >= 21) {
+                    assert (new_state.p1_score < 21);
+                    if (new_state.p2_score >= 21) {
                         total_wins_p2 += multiplier * roll1.count * roll2.count;
                     } else {
                         new_states[new_state] += multiplier * roll1.count * roll2.count;
@@ -104,6 +107,5 @@ int64_t result2(Board b)
         if (new_states.empty()) { break; }
         if (round_no > 13) { break; }
     }
-    total_wins_p1 /= 7;
     return std::max(total_wins_p1, total_wins_p2);
 }

@@ -55,16 +55,8 @@ void addStepToPartitioning(std::vector<RebootStep>& p, RebootStep const& step)
         RebootStep const& s = p[i];
         if (intersects(s.region, step.region)) {
             auto const intersection = intersect(s.region, step.region);
-            if ((s.turn == RebootStep::Turn::On) && (step.turn == RebootStep::Turn::On)) {
-                p.push_back(RebootStep{ .turn = RebootStep::Turn::Off, .region = intersection });
-            } else if ((s.turn == RebootStep::Turn::On) && (step.turn == RebootStep::Turn::Off)) {
-                p.push_back(RebootStep{ .turn = RebootStep::Turn::Off, .region = intersection });
-            } else if ((s.turn == RebootStep::Turn::Off) && (step.turn == RebootStep::Turn::On)) {
-                p.push_back(RebootStep{ .turn = RebootStep::Turn::On, .region = intersection });
-            } else {
-                assert((s.turn == RebootStep::Turn::Off) && (step.turn == RebootStep::Turn::Off));
-                p.push_back(RebootStep{ .turn = RebootStep::Turn::On, .region = intersection });
-            }
+            auto const t = (s.turn == RebootStep::Turn::On) ? RebootStep::Turn::Off : RebootStep::Turn::On;
+            p.push_back(RebootStep{ .turn = t, .region = intersection });
         }
     }
 }
